@@ -2,12 +2,15 @@ import pandas as pd
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 import numpy as np
+pd.set_option('display.max_columns', 100)
+pd.set_option('display.expand_frame_repr', False)
+pd.set_option('max_colwidth', -1)
 
 N_INPUT_DATA = 5 #features
 MINS_IN_A_DAY = 1440
 N_DAYS = 6
-# count = int([line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\count.data")][0]) * N_INPUT_DATA
-count = int(MINS_IN_A_DAY*N_DAYS)*N_INPUT_DATA
+count = int([line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\training_data_generator\\src\\count.data")][0])
+# count = int(MINS_IN_A_DAY*N_DAYS*N_INPUT_DATA)
 print("features dimension is %d." % count)
 
 names_ = [str(n) for n in range(1, count)]
@@ -29,14 +32,14 @@ print(data_frame)
 X = data_frame[names_].values
 y = data_frame["famacha_class"].values.flatten()
 
-s = 100
+s = 1000
 train_x = X[0:s]
 train_y = y[0:s]
 
 test_x = X[s:]
 test_y = y[s:]
 
-clf = svm.SVC(kernel='rbf', C=1000)
+clf = svm.SVC(kernel='rbf', C=1000, gamma='auto')
 
 print("training...")
 clf.fit(train_x, train_y)
