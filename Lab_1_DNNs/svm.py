@@ -3,70 +3,47 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score
 import numpy as np
 
+N_INPUT_DATA = 5 #features
+MINS_IN_A_DAY = 1440
+N_DAYS = 6
+# content = [line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\count.data")]
+# count = int(content[0]) * N_INPUT_DATA
+count = int(MINS_IN_A_DAY*N_DAYS)*N_INPUT_DATA
+print("features dimension is %d." % count)
 
-def prediction_is_right(prediction, ground_truth):
-    i_g = ground_truth.index(1)
-    i_p = prediction.index(max(prediction))
-    return i_g == i_p
-
-names_ = [str(n) for n in range(1, 1087)]
+names_ = [str(n) for n in range(1, count)]
 names_.append("famacha_class")
 print("loading dataset...")
-data = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\training_f_c.data", sep=",",
-                   names=names_)
+data_frame = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\training_time_domain.data", sep=",",
+                         names=names_)
 np.random.seed(0)
-data = data.sample(frac=1).reset_index(drop=True)
-# data = data.truncate(after=150)
-print(data)
-#
-X = data[names_].values
-#
-y = data["famacha_class"].values.flatten()
+data_frame = data_frame.sample(frac=1).reset_index(drop=True)
+print(data_frame)
 
-s = 400
+data_frame = data_frame.fillna(-1)
+
+# data_frame = data_frame.interpolate(limit_direction='both')
+
+print(data_frame.isnull().values.any())
+print(data_frame)
+
+X = data_frame[names_].values
+y = data_frame["famacha_class"].values.flatten()
+
+s = 100
 train_x = X[0:s]
 train_y = y[0:s]
 
 test_x = X[s:]
 test_y = y[s:]
 
+clf = svm.SVC(kernel='rbf', C=1000)
 
-# we create 40 separable points
-# X, y = make_blobs(n_features=3, n_samples=3, centers=2, random_state=6)
-
-# fit the model, don't regularize for illustration purposes
-clf = svm.SVC(kernel='linear', C=1000)
 print("training...")
 clf.fit(train_x, train_y)
-# d = clf.decision_function(X)
 print("predicting...")
 predicted = clf.predict(test_x)
-# print(X, y)
 print(test_y, predicted)
-
 accuracy = accuracy_score(test_y, predicted)
 print(accuracy)
 
-# a = X[0:2, 0]
-# b = X[2:4, 1]
-# plt.scatter(a, b, c=y, s=30, cmap=plt.cm.Paired)
-#
-# # plot the decision function
-# ax = plt.gca()
-# xlim = ax.get_xlim()
-# ylim = ax.get_ylim()
-#
-# # create grid to evaluate model
-# xx = np.linspace(xlim[0], xlim[1], 30)
-# yy = np.linspace(ylim[0], ylim[1], 30)
-# YY, XX = np.meshgrid(yy, xx)
-# xy = np.vstack([XX.ravel(), YY.ravel()]).T
-# Z = clf.decision_function(xy).reshape(XX.shape)
-#
-# # plot decision boundary and margins
-# ax.contour(XX, YY, Z, colors='k', levels=[-1, 0, 1], alpha=0.5,
-#            linestyles=['--', '-', '--'])
-# # plot support vectors
-# ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100,
-#            linewidth=1, facecolors='none', edgecolors='k')
-# plt.show()

@@ -48,10 +48,13 @@ sess = tf.Session()
 # n_x = len(all_x.columns)
 # n_y = len(all_y.columns)
 
-names_ = [str(n) for n in range(1, 1087)]
+lines = [line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\count.data")]
+count = int(lines[0])*2
+
+names_ = [str(n) for n in range(1, count)]
 names_.append("famacha_class")
 
-data = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\training_t_c.data", sep=",",
+data = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\training_time_domain.data", sep=",",
                    names=names_)
 
 np.random.seed(0)
@@ -65,7 +68,7 @@ all_y = pd.get_dummies(data.famacha_class)
 n_x = len(all_x.columns)
 n_y = len(all_y.columns)
 
-s_ = 400
+s_ = 600
 train_x_s = np.split(all_x, [s_], axis=0)
 train_y_s = np.split(all_y, [s_], axis=0)
 
@@ -108,22 +111,22 @@ y = tf.placeholder(tf.float32, shape=[None, n_y], name='output')
 #         print("Accuracy of Perceptron at epoch %d is %.2f" % (epoch, accuracy))
 
 #3.5 Define a DEEP fully connected network
-layer1_s = 100
+layer1_s = 18
 W_fc1 = tf.Variable(tf.truncated_normal([n_x, layer1_s], stddev=0.1), name="layer1_weights")
 b_fc1 = tf.Variable(tf.constant(0.1, shape=[layer1_s]), name="layer1_bias")
 h_fc1 = tf.nn.relu(tf.matmul(x, W_fc1) + b_fc1, name="layer1_output")
 
-layer2_s = 150
+layer2_s = 15
 W_fc2 = tf.Variable(tf.truncated_normal([layer1_s, layer2_s], stddev=0.1), name="layer2_weights")
 b_fc2 = tf.Variable(tf.constant(0.1, shape=[layer2_s]), name="layer2_bias")
 h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2, name="layer2_output")
 
-layer3_s = 90
+layer3_s = 100
 W_fc3 = tf.Variable(tf.truncated_normal([layer2_s, layer3_s], stddev=0.1), name="layer3_weight")
 b_fc3 = tf.Variable(tf.constant(0.1, shape=[layer3_s]), name="layer3_bias")
 h_fc3 = tf.nn.relu(tf.matmul(h_fc2, W_fc3) + b_fc3, name="layer3_output")
 
-layer4_s = 70
+layer4_s = 90
 W_fc4 = tf.Variable(tf.truncated_normal([layer3_s, layer4_s], stddev=0.1), name="layer4_weight")
 b_fc4 = tf.Variable(tf.constant(0.1, shape=[layer4_s]), name="layer4_bias")
 h_fc4 = tf.nn.relu(tf.matmul(h_fc3, W_fc4) + b_fc4, name="layer4_output")
@@ -159,9 +162,9 @@ b_fc10 = tf.Variable(tf.constant(0.1, shape=[layer10_s]), name="layer10_bias")
 h_fc10 = tf.nn.relu(tf.matmul(h_fc9, W_fc10) + b_fc10, name="layer10_output")
 
 layero_s = 2  # output class
-W_fco = tf.Variable(tf.truncated_normal([layer10_s, layero_s], stddev=0.1), name="output_weight")
+W_fco = tf.Variable(tf.truncated_normal([layer3_s, layero_s], stddev=0.1), name="output_weight")
 b_fco = tf.Variable(tf.constant(0.1, shape=[layero_s]), name="output_bias")
-predictions_fcn = tf.nn.relu(tf.matmul(h_fc10, W_fco) + b_fco, name="predicted_output")
+predictions_fcn = tf.nn.relu(tf.matmul(h_fc3, W_fco) + b_fco, name="predicted_output")
 
 print(h_fc1, h_fc2, h_fc3, h_fc4, predictions_fcn)
 
@@ -195,8 +198,8 @@ with tf.name_scope('accuracy'):
     acc = tf.reduce_mean(correct_classification)
 tf.summary.scalar('accuracy', acc)
 
-logs_path = "./logs_%s/" % time.time()
-purge_dir("./logs_%s" % time.time())
+logs_path = "./logs/logs_%s/" % time.time()
+purge_dir("./logs")
 g = tf.get_default_graph()
 
 with g.as_default():
@@ -208,6 +211,9 @@ with g.as_default():
 
         sess.run([optimizer_fcn], feed_dict={x: train_x, y: train_y})
         sess.run(predictions_fcn, feed_dict={x: test_x, y: test_y}).tolist()
+
+        # print(sess.run(top_1_oy, feed_dict={x: test_x, y: test_y}).tolist())
+        # print(sess.run(top_1_op, feed_dict={x: test_x, y: test_y}).tolist())
         # summary_acc = sess.run(acc_summary, feed_dict={x: test_x, y: test_y})
         # compute accuracy
         # print("t", test_y.values.tolist())
