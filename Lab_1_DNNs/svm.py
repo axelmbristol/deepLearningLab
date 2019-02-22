@@ -6,15 +6,14 @@ import numpy as np
 N_INPUT_DATA = 5 #features
 MINS_IN_A_DAY = 1440
 N_DAYS = 6
-# content = [line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\count.data")]
-# count = int(content[0]) * N_INPUT_DATA
+# count = int([line.rstrip('\n') for line in open("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\count.data")][0]) * N_INPUT_DATA
 count = int(MINS_IN_A_DAY*N_DAYS)*N_INPUT_DATA
 print("features dimension is %d." % count)
 
 names_ = [str(n) for n in range(1, count)]
 names_.append("famacha_class")
 print("loading dataset...")
-data_frame = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\famatchatable\\training_time_domain.data", sep=",",
+data_frame = pd.read_csv("C:\\Users\\fo18103\PycharmProjects\\training_data_generator\\src\\training_time_domain.data", sep=",",
                          names=names_)
 np.random.seed(0)
 data_frame = data_frame.sample(frac=1).reset_index(drop=True)
